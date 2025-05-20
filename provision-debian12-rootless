@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# provision-debian12-rootless
+
+# 0. Stopwatch: Start
+echo "Hello World at $(date +%Y-%m-%d:%H:%M:%S)" >> /tmp/startup-script.txt
+
+# 1. Update packages and install prerequisites
+echo "Update and Install at $(date +%Y-%m-%d:%H:%M:%S)" >> /tmp/startup-script.txt
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get upgrade -y \
+    -o Dpkg::Options::="--force-confdef" \
+    -o Dpkg::Options::="--force-confold"
+apt-get install -y \
+    dbus-user-session \
+    fail2ban \
+    slirp4netns \
+    uidmap
+
+# 2. Enforce key-only authentication by adding a dedicated SSH configuration file.
+echo "Disable SSH password auth at $(date +%Y-%m-%d:%H:%M:%S)" >> /tmp/startup-script.txt
+rm -f /etc/ssh/sshd_config.d/50-cloud-init.conf
+cat << 'EOF' > /etc/ssh/sshd_config.d/50-disable-password.conf
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+EOF
+chmod 644 /etc/ssh/sshd_config.d/50-disable-password.conf
+systemctl restart sshd
+
+# 3. Install Docker's official GPG key and repository for Debian
+echo "Install Docker repository at $(date +%Y-%m-%d:%H:%M:%S)" >> /tmp/startup-script.txt
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+chmod a+r /etc/apt/keyrings/docker.asc
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  tee /etc/apt/sources.list.d/docker.list > /dev/null
+apt-get update
+
+# 4. Install Docker Engine and rootless extras
+echo "Install Docker at $(date +%Y-%m-%d:%H:%M:%S)" >> /tmp/startup-script.txt
+apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-ce-rootless-extras
+apt-get autoremove -y
+
+# 5. Set up rootless Docker for linuxuser
+echo "Setup rootless Docker at $(date +%Y-%m-%d:%H:%M:%S)" >> /tmp/startup-script.txt
+cat << 'EOF' >> /home/linuxuser/.bashrc
+
+# auto-install rootless Docker on first login
+if [ ! -f "${HOME}/.rootless-docker-installed" ]; then
+    echo "Installing rootless Docker for the first time..."
+    dockerd-rootless-setuptool.sh install
+    if [ $? -eq 0 ]; then
+        touch "${HOME}/.rootless-docker-installed"
+        echo "Rootless Docker installation completed."
+    else
+        echo "Rootless Docker installation failed. Please run 'dockerd-rootless-setuptool.sh install' manually."
+    fi
+fi
+
+# make sure we set up our environment variables for Docker
+export DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock
+EOF
+loginctl enable-linger linuxuser
+
+# 6. Configure SSH keys for linuxuser
+echo "Configure linuxuser SSH keys at $(date +%Y-%m-%d:%H:%M:%S)" >> /tmp/startup-script.txt
+mkdir -p /home/linuxuser/.ssh
+cp /root/.ssh/authorized_keys /home/linuxuser/.ssh/authorized_keys
+chown -R linuxuser:linuxuser /home/linuxuser/.ssh
+chmod 644 /home/linuxuser/.ssh/authorized_keys
+
+# 7. Stopwatch: End
+echo "Goodbye Cruel World at $(date +%Y-%m-%d:%H:%M:%S)" >> /tmp/startup-script.txt
