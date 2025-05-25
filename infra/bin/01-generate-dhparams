@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# 01-generate-dhparams
+
+# we use this script to help nginx make TLS connections more secure
+# for clients running older versions of TLS
+# See: https://security.stackexchange.com/questions/94390/whats-the-purpose-of-dh-parameters
+
+cd ~/vultr/infra
+
+openssl dhparam -out nginx/ssl-dhparams.pem 4096

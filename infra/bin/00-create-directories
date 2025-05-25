@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# 00-create-directories
+
+# we use this script to create the tree for nginx volume mounts
+
+cd ~/vultr/infra
+
+mkdir -p nginx/certs
+mkdir -p nginx/conf.d
+mkdir -p nginx/www

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# 03-obtain-certs
+
+# we use this script to run certbot to obtain an SSL certificate for the site
+
+cd ~/vultr/infra
+
+docker run \
+    --rm \
+    --volume $(pwd)/nginx/www:/var/www/certbot \
+    --volume $(pwd)/nginx/certs:/etc/letsencrypt \
+    certbot/certbot certonly \
+        --webroot \
+        --webroot-path=/var/www/certbot \
+        --email admin@perapera.quest \
+        --agree-tos \
+        --no-eff-email \
+        -d perapera.quest
