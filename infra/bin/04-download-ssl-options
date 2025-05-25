@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# 04-download-ssl-options
+
+# we use this script to obtain a copy of the certbot ssl options
+
+cd ~/vultr/infra
+
+curl -fsSL \
+    https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf \
+    -o nginx/certs/options-ssl-nginx.conf
