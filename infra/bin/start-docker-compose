@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# start-docker-compose
+
+# we use this script to start the services orchestrated by docker compose
+
+cd ~/vultr/infra
+
+docker compose up --detach

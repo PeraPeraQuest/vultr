@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# stop-docker-compose
+
+# we use this script to stop the services orchestrated by docker compose
+
+cd ~/vultr/infra
+
+docker compose down
