@@ -17,6 +17,8 @@ services:
       - "host.docker.internal:host-gateway"
     depends_on:
       - game
+    networks:
+      - webnet
 
   game:
     image: ghcr.io/peraperaquest/peraperaquest:latest
