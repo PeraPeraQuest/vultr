@@ -62,6 +62,7 @@ fi
 # make sure we set up our environment variables for Docker
 export DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock
 EOF
+setcap cap_net_bind_service=ep $(which rootlesskit)
 loginctl enable-linger linuxuser
 
 # 6. Configure SSH keys for linuxuser
@@ -71,5 +72,10 @@ cp /root/.ssh/authorized_keys /home/linuxuser/.ssh/authorized_keys
 chown -R linuxuser:linuxuser /home/linuxuser/.ssh
 chmod 644 /home/linuxuser/.ssh/authorized_keys
 
-# 7. Stopwatch: End
+# 7. Configure firewall rules to allow web access
+echo "Configure firewall at $(date +%Y-%m-%d:%H:%M:%S)" >> /tmp/startup-script.txt
+ufw allow 80/tcp comment 'Allow HTTP (letsencrypt)'
+ufw allow 443/tcp comment 'Allow HTTPS (perapera)'
+
+# 8. Stopwatch: End
 echo "Goodbye Cruel World at $(date +%Y-%m-%d:%H:%M:%S)" >> /tmp/startup-script.txt
