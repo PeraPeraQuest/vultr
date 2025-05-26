@@ -13,8 +13,6 @@ services:
       - ./nginx/www:/var/www/certbot:ro
       - ./nginx/certs:/etc/letsencrypt
       - ./nginx/ssl-dhparams.pem:/etc/ssl/certs/dhparam.pem:ro
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     depends_on:
       - game
     networks:
@@ -24,7 +22,7 @@ services:
     image: ghcr.io/peraperaquest/peraperaquest:latest
     container_name: game
     expose:
-      - "8080"
+      - "8080:8080"
     networks:
       - webnet
 

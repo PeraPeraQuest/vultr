@@ -76,6 +76,7 @@ chmod 644 /home/linuxuser/.ssh/authorized_keys
 echo "Configure firewall at $(date +%Y-%m-%d:%H:%M:%S)" >> /tmp/startup-script.txt
 ufw allow 80/tcp comment 'Allow HTTP (letsencrypt)'
 ufw allow 443/tcp comment 'Allow HTTPS (perapera)'
+ufw allow 8000/tcp comment 'Allow HTTPS (haibi-chan)'
 
 # 8. Stopwatch: End
 echo "Goodbye Cruel World at $(date +%Y-%m-%d:%H:%M:%S)" >> /tmp/startup-script.txt
