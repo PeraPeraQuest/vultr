@@ -28,4 +28,4 @@ SHELL=/bin/bash
 PATH=/home/linuxuser/.local/bin:/usr/bin:/bin
 
 # every day at 3 AM, reload nginx to pick up renewed SSL certs (if any)
-0 3 * * * cd /home/linuxuser/vultr/infra && docker-compose exec -T nginx nginx -s reload >> /home/linuxuser/vultr/infra/nginx/nginx-reload.log 2>&1
+0 3 * * * cd /home/linuxuser/vultr/infra && docker compose exec -T nginx nginx -s reload >> /home/linuxuser/vultr/infra/nginx/nginx-reload.log 2>&1
