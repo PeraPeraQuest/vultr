@@ -14,7 +14,18 @@ services:
       - ./nginx/certs:/etc/letsencrypt
       - ./nginx/ssl-dhparams.pem:/etc/ssl/certs/dhparam.pem:ro
     depends_on:
+      - monban-kun
       - game
+    networks:
+      - webnet
+
+  monban-kun:
+    image: ghcr.io/peraperaquest/monban-kun:latest
+    container_name: monban-kun
+    expose:
+      - "3000:3000"
+    env_file:
+      - ./env.monban
     networks:
       - webnet
 
